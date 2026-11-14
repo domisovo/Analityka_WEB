@@ -1,0 +1,103 @@
+{
+  "environment": "Chromium 151.0.7922.34",
+  "url": "http://127.0.0.1:8765",
+  "executed_at": "2026-11-14T23:43:28.653Z",
+  "scope": "Projekt z pustym identyfikatorem GTM. Zewnętrzne żądania są przechwytywane i liczone. Weryfikacja usług dostawców wymaga osobnych testów.",
+  "results": [
+    {
+      "id": "F01",
+      "status": "PASS",
+      "actual": "Trzy kotwice i podstrona prywatności działają."
+    },
+    {
+      "id": "F02/A02",
+      "status": "PASS",
+      "actual": "Trzy CTA prowadzą do jednego formularza i zachowują odrębne parametry."
+    },
+    {
+      "id": "F03",
+      "status": "PASS",
+      "actual": "7 pytań otwartych spacją i zamkniętych Enterem."
+    },
+    {
+      "id": "F04",
+      "status": "PASS",
+      "actual": "320, 390, 768 i 1440 px bez przewijania poziomego. Menu działa klawiaturą i zwraca fokus."
+    },
+    {
+      "id": "F05/F06",
+      "status": "PASS",
+      "actual": "Formularz ukończony samą klawiaturą przy odmowie. Sukces ma fokus, pola są czyste, lead = 0."
+    },
+    {
+      "id": "F07/A04",
+      "status": "PASS",
+      "actual": "Puste pola i błędny e-mail mają komunikaty, lead = 0. Fokus sam nie rozpoczyna próby, interakcje dały jeden form_start."
+    },
+    {
+      "id": "F08/A05/A06",
+      "status": "PASS",
+      "actual": "Po dwukliku jeden lead po sukcesie i jedna sekwencja lejka. Dane pól nieobecne w dataLayer, URL i pamięci."
+    },
+    {
+      "id": "A07",
+      "status": "PASS",
+      "actual": "Odsłona, start i lead w poprawnej kolejności bez kliknięcia CTA."
+    },
+    {
+      "id": "A01",
+      "status": "PASS",
+      "actual": "Jedno page_view na dokument, bez query i hash. Kliknięcie kotwicy go nie powiela."
+    },
+    {
+      "id": "A03-390",
+      "status": "PASS",
+      "actual": "Krótki kontakt pominięty, pełny warunek daje jedno zdarzenie nawet po powrocie. Sekcja/ekran w px: 1070/670"
+    },
+    {
+      "id": "A03-1440",
+      "status": "PASS",
+      "actual": "Krótki kontakt pominięty, pełny warunek daje jedno zdarzenie nawet po powrocie. Sekcja/ekran w px: 742/900"
+    },
+    {
+      "id": "Z01/Z02",
+      "status": "PASS",
+      "actual": "Brak decyzji i zapisana odmowa mają obie kategorie wyłączone. Brak zdarzeń biznesowych."
+    },
+    {
+      "id": "Z03",
+      "status": "PASS",
+      "actual": "Utrzymany wybór po odświeżeniu i oczekiwane lokalne zdarzenia. Analityka true, marketing false."
+    },
+    {
+      "id": "Z04",
+      "status": "PASS",
+      "actual": "Utrzymany wybór po odświeżeniu i oczekiwane lokalne zdarzenia. Analityka false, marketing true."
+    },
+    {
+      "id": "Z05",
+      "status": "PASS",
+      "actual": "Utrzymany wybór po odświeżeniu i oczekiwane lokalne zdarzenia. Analityka true, marketing true."
+    },
+    {
+      "id": "Z06",
+      "status": "PASS",
+      "actual": "Wycofanie jednej i obu zgód przeładowuje dokument i zachowuje aktualny stan."
+    },
+    {
+      "id": "Z07",
+      "status": "PASS",
+      "actual": "Przyznanie zgody inicjuje pomiar bieżącego widoku bez odtwarzania kliknięcia, startu i leada."
+    },
+    {
+      "id": "Z08",
+      "status": "PASS",
+      "actual": "Wycofanie w jednej karcie aktualizuje i przeładowuje drugą kartę LP."
+    },
+    {
+      "id": "Z09",
+      "status": "PASS",
+      "actual": "Błąd zapisu przy wycofaniu skutkuje odmową w nowym dokumencie i usuwa poprzedni zapis, gdy pamięć na to pozwala."
+    }
+  ]
+}
