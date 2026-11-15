@@ -1,8 +1,8 @@
 {
   "environment": "Chromium 151.0.7922.34",
   "url": "http://127.0.0.1:8765",
-  "executed_at": "2026-11-14T23:43:28.653Z",
-  "scope": "Projekt z pustym identyfikatorem GTM. Zewnętrzne żądania są przechwytywane i liczone. Weryfikacja usług dostawców wymaga osobnych testów.",
+  "executed_at": "2026-11-15T00:39:20.693Z",
+  "scope": "Tryb lokalny i adapter Cookiebot z testowymi obiektami API, bez GTM i bez identyfikatorów usług. Sieć zewnętrzna przechwytywana. Odbiór dostawców i Element Visibility wymagają osobnych testów.",
   "results": [
     {
       "id": "F01",
@@ -22,72 +22,67 @@
     {
       "id": "F04",
       "status": "PASS",
-      "actual": "320, 390, 768 i 1440 px bez przewijania poziomego. Menu działa klawiaturą i zwraca fokus."
+      "actual": "320, 390, 768 i 1366 px bez przewijania poziomego. Menu działa klawiaturą i zwraca fokus."
     },
     {
       "id": "F05/F06",
       "status": "PASS",
-      "actual": "Formularz ukończony samą klawiaturą przy odmowie. Sukces ma fokus, pola są czyste, lead = 0."
+      "actual": "Klawiatura wystarcza przy odmowie lokalnej. Fokus na potwierdzeniu, pola wyczyszczone, jeden lokalny sygnał."
     },
     {
       "id": "F07/A04",
       "status": "PASS",
-      "actual": "Puste pola i błędny e-mail mają komunikaty, lead = 0. Fokus sam nie rozpoczyna próby, interakcje dały jeden form_start."
+      "actual": "Puste pola i błędny e-mail mają komunikaty, lead = 0. Fokus i pusta próba nie mierzą startu. Pierwsza edycja daje jeden form_start."
     },
     {
       "id": "F08/A05/A06",
       "status": "PASS",
-      "actual": "Po dwukliku jeden lead po sukcesie i jedna sekwencja lejka. Dane pól nieobecne w dataLayer, URL i pamięci."
+      "actual": "Po dwukliku jeden lead_success, zgodny komunikat i jawnie zablokowany przycisk. Dane pól nieobecne w dataLayer, URL i pamięci."
     },
     {
       "id": "A07",
       "status": "PASS",
-      "actual": "Odsłona, start i lead w poprawnej kolejności bez kliknięcia CTA."
+      "actual": "Jeden form_start i lead_success bez kliknięcia CTA."
     },
     {
       "id": "A01",
       "status": "PASS",
-      "actual": "Jedno page_view na dokument, bez query i hash. Kliknięcie kotwicy go nie powiela."
+      "actual": "Bez ręcznych odsłon i zdarzeń dostawców w dataLayer. CTA zachowuje wejściowe UTM bez dodawania własnych."
     },
     {
       "id": "A03-390",
       "status": "PASS",
-      "actual": "Krótki kontakt pominięty, pełny warunek daje jedno zdarzenie nawet po powrocie. Sekcja/ekran w px: 1070/670"
+      "actual": "Blok 265 px w oknie 670 px; widoczne 100%. Brak lokalnego section_view po 2100 ms."
     },
     {
-      "id": "A03-1440",
+      "id": "A03-1366",
       "status": "PASS",
-      "actual": "Krótki kontakt pominięty, pełny warunek daje jedno zdarzenie nawet po powrocie. Sekcja/ekran w px: 742/900"
+      "actual": "Blok 320 px w oknie 900 px; widoczne 100%. Brak lokalnego section_view po 2100 ms."
     },
     {
       "id": "Z01/Z02",
       "status": "PASS",
-      "actual": "Brak decyzji i zapisana odmowa mają obie kategorie wyłączone. Brak zdarzeń biznesowych."
+      "actual": "Panel startuje bez decyzji. Odmowa zachowana po odświeżeniu; brak sieci zewnętrznej."
     },
     {
       "id": "Z03",
       "status": "PASS",
-      "actual": "Utrzymany wybór po odświeżeniu i oczekiwane lokalne zdarzenia. Analityka true, marketing false."
+      "actual": "Zapis po odświeżeniu: analityka true, marketing false. Sygnały tylko w lokalnej kolejce."
     },
     {
       "id": "Z04",
       "status": "PASS",
-      "actual": "Utrzymany wybór po odświeżeniu i oczekiwane lokalne zdarzenia. Analityka false, marketing true."
+      "actual": "Zapis po odświeżeniu: analityka false, marketing true. Sygnały tylko w lokalnej kolejce."
     },
     {
       "id": "Z05",
       "status": "PASS",
-      "actual": "Utrzymany wybór po odświeżeniu i oczekiwane lokalne zdarzenia. Analityka true, marketing true."
+      "actual": "Zapis po odświeżeniu: analityka true, marketing true. Sygnały tylko w lokalnej kolejce."
     },
     {
       "id": "Z06",
       "status": "PASS",
       "actual": "Wycofanie jednej i obu zgód przeładowuje dokument i zachowuje aktualny stan."
-    },
-    {
-      "id": "Z07",
-      "status": "PASS",
-      "actual": "Przyznanie zgody inicjuje pomiar bieżącego widoku bez odtwarzania kliknięcia, startu i leada."
     },
     {
       "id": "Z08",
@@ -98,6 +93,26 @@
       "id": "Z09",
       "status": "PASS",
       "actual": "Błąd zapisu przy wycofaniu skutkuje odmową w nowym dokumencie i usuwa poprzedni zapis, gdy pamięć na to pozwala."
+    },
+    {
+      "id": "CMP01",
+      "status": "PASS",
+      "actual": "Tryb docelowy z pustym ID bez lokalnego panelu; sukces przed zgodą działa, a przyznanie testowego stanu niczego nie odtwarza."
+    },
+    {
+      "id": "CMP02",
+      "status": "PASS",
+      "actual": "Kontrolka wywołała renew; adapter respektuje podany stan i właściwą kategorię dla lead_success."
+    },
+    {
+      "id": "CMP03",
+      "status": "PASS",
+      "actual": "Kontrolka wywołała renew; adapter respektuje podany stan i właściwą kategorię dla lead_success."
+    },
+    {
+      "id": "CMP04",
+      "status": "PASS",
+      "actual": "Dwie notyfikacje cofnięcia dały jedno przeładowanie; w nowym dokumencie odmowa nie wywołała kolejnego."
     }
   ]
 }

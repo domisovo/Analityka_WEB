@@ -18,3 +18,15 @@ Nazwa robocza **EquiSoul | odwiedzili LP 30 dni | bez Lead**. W **Meta Audiences
 | Grafika | Pionowy kadr z galerii przedstawiający osobę w zapiętym kasku i instruktorkę obok. Bez danych uczestników. |
 
 Projekt kreacji jest częścią raportu akademickiego. Kampania płatna pozostaje poza zakresem projektu.
+
+## Drugi wariant komunikatu
+
+| Element | Wariant B |
+| --- | --- |
+| Cel komunikacji | Pomóc ocenić organizację i zakres zajęć przed zgłoszeniem. |
+| Nagłówek | Cztery godziny z końmi w kameralnej grupie |
+| Tekst | Zacznij od poznania konia i pielęgnacji. Potem wypróbuj podstawy jazdy z instruktorem. Zobacz program demonstracyjnych warsztatów EquiSoul w okolicach Krakowa. |
+| CTA | Dowiedz się więcej |
+| Grafika | Ilustracja konia w drewnianej stajni z galerii LP. |
+
+Pierwszy wariant odpowiada przede wszystkim na brak doświadczenia, drugi na potrzebę przewidywalnego planu. **[Wybór zespołu, samodzielna poprawka, uzasadnienie obiekcją]**. Wykluczenie leada ogranicza ponowną zachętę do czynności już zakończonej w mierzonym ruchu. Przy wspólnym Pixelu zawęźcie oba warunki do strony EquiSoul lub opiszcie ograniczenie źródła. Jeśli Lead jeszcze nie jest w selektorze, zachowajcie dowód jego odbioru i dokładną regułę do późniejszego ustawienia. Status grupy **NOT TESTED**.

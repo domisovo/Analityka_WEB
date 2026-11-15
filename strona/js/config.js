@@ -1,2 +1,5 @@
-// Wpisz rzeczywisty identyfikator kontenera web po skonfigurowaniu tagów w GTM.
-window.EquiSoulConfig = Object.freeze({ gtmContainerId: '' });
+// Tryby rozłączne. Dla wdrożenia wybierz 'cookiebot' i wpisz prawdziwe ID GTM.
+window.EquiSoulConfig = Object.freeze({
+  consentMode: 'local',
+  gtmContainerId: ''
+});

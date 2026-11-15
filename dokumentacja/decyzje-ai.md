@@ -41,3 +41,15 @@ Polecenia poniżej są fragmentami otrzymanej specyfikacji. Uzupełnijcie własn
 | Meta, Clarity i analiza | [osoba] | [osoba] | [uzupełnijcie] |
 
 Na prezentacji każda osoba odpowiada za wyjaśnienie celu LP, drogi zdarzenia do GA4 i Meta i jednego testu. Zapiszcie, kto powtórzył test i kiedy.
+
+## Rewizja po instrukcjach 01–05
+
+Poniższe wpisy powstały po pierwszym wdrożeniu lokalnym. Oceny własne pozostają do wpisania przez zespół.
+
+| Obszar | Fragment polecenia | Propozycja i uzasadnienie techniczne | Alternatywa i wada | Wynik sprawdzenia | Własna decyzja |
+| --- | --- | --- | --- | --- | --- |
+| Struktura | „Przygotuj dwa warianty układu LP i ich porównanie” | Opisać istniejący układ i porównać z wcześniejszym FAQ. | Wcześniejsze FAQ skraca drogę do odpowiedzi, ale wydłuża drogę do programu. | F02/F04 potwierdzają CTA i układ obecnej wersji; zrozumienie czeka na drugą parę. | [ocena, uzasadnienie] |
+| UX | „Zapewnij najwyżej jeden sukces … jawnie blokuj przycisk” | Blokada `disabled` przed potwierdzeniem, z istniejącym stanem `completed`. | Sama blokada wizualna nie zatrzyma ponownego submitu; dwa zabezpieczenia trzeba sprawdzić w teście. | F07/A04 oraz F08/A05/A06 potwierdzają negatywne i pozytywne przejście. | [ocena, uzasadnienie] |
+| Pomiar | „Przygotuj element workshop_program_summary … 50% … 2000 ms” | Nadać ID istniejącemu akapitowi wraz z nagłówkiem i przenieść czas do GTM. | Cały program jest znacznie wyższy na mobile; mniejszy blok opisuje tylko podsumowanie. | A03 osiągnął 100% widoczności w obu próbach. Tagi i czas w GTM do weryfikacji. | [ocena, uzasadnienie] |
+
+Wcześniejsza decyzja D3 i wartości 1070/670 oraz 742/900 px odnoszą się wyłącznie do poprzedniego mechanizmu z [przebiegu v1](../dowody/historia/v1/README.md). W rewizji propozycję z lokalnym licznikiem zastąpiono regułą prowadzącego.

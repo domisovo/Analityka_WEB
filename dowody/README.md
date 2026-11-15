@@ -1,25 +1,26 @@
-# Indeks dowodów
+# Dowody bieżącej rewizji
 
-Testy lokalne wykonano 14.11.2026 w Chromium. Narzędzie testowe użyło pustego pola GTM. [Rzeczywiste wyniki z datą i wersją przeglądarki](wyniki-lokalne.json)
+[Wyniki przeglądarkowe JSON](wyniki-lokalne.json) pochodzą z Chromium z pustymi identyfikatorami usług. Próby CMP używają kontrolowanego interfejsu w przeglądarce. [Historia poprzedniej wersji](historia/v1/README.md) jest osobna.
 
-| Dowód | Co pokazuje | Granica interpretacji |
+| Dowód | Co potwierdza | Ograniczenie |
 | --- | --- | --- |
-| [Desktop](lp/desktop.png) | Nawigację, hero, CTA i pasek faktów w 1440 px | Jeden widok lokalny po odmowie. |
-| [Telefon](lp/mobile.png) | Ułożenie hero i zamknięte menu w 390 px | Jeden rozmiar w emulacji Chromium. |
-| [Błędny e-mail](formularz/negatywny.png) | Czytelny błąd lokalny przy próbie zatwierdzenia | Brak lokalnego `generate_lead` jest zapisany w teście F07/A04. Zrzut nie potwierdza zachowania dostawców. |
-| [Poprawna próba](formularz/sukces.png) | Wyświetlenie potwierdzenia po walidacji | Jeden lokalny lead potwierdza F08/A05/A06. Brak potwierdzenia odbioru GA4 i Meta. |
-| [Zmiana zgód](zgody/zmiana-wyboru.png) | Niezależne kontrolki przed zapisaniem zmiany | Przeładowanie i odczyt wybranego stanu są w teście Z06. Brak działającego kontenera. |
-| [JSON testów](wyniki-lokalne.json) | Wyniki automatycznych testów strony, logiki i lokalnej kolejki przy pustym ID GTM | Scenariusze lokalne. Zakres nie obejmuje faktycznego odbioru platform, liczebności grupy ani skuteczności oferty. |
+| [Desktop 1366 px](lp/desktop.png) | Nawigacja, hero i CTA | Zrzut jednego stanu lokalnego |
+| [Telefon 390 px](lp/mobile.png) | Widok mobilny i zamknięte menu | Emulacja Chromium |
+| [Błędny formularz](formularz/negatywny.png) | Widoczny komunikat i stan błędu | Brak sukcesu potwierdza lokalny log F07/A04 |
+| [Sukces](formularz/sukces.png) | Komunikat wg instrukcji | Blokadę, deduplikację i brak danych w kolejce potwierdza F08/A05/A06. Odbiór wymaga wdrożenia. |
+| [Ustawienia](zgody/zmiana-wyboru.png) | Niezależne kontrolki lokalnego panelu | Próba Z06 bez Cookiebot i wykonania tagów |
+| [Wyniki](wyniki-lokalne.json) | Rzeczywisty przebieg lokalny, w tym adapter, geometria i brak ręcznej emisji | Nie potwierdza odbioru GA4, Meta i Clarity |
 
-## Do uzupełnienia po konfiguracji
+## Brakujące dowody · NOT TESTED
 
-| Katalog | Potrzebny dowód | Granica interpretacji |
+| Zakres | Dowód do zebrania | Co pozwoli stwierdzić |
 | --- | --- | --- |
-| `lp/` | Publiczny URL HTTPS, pomyślny deployment i widok publiczny | Dostępność konkretnej wersji w czasie testu. |
-| [gtm](gtm/README.md) | Preview zdarzeń, wartości zmiennych i stany zgód, wersja opublikowana | Preview sprawdza uruchomienie i parametry tagów. Odbiór sprawdzają widoki dostawców. |
-| [ga4](ga4/README.md) | DebugView, oznaczenie zdarzenia kluczowego, lejki i tabela CTA | Pokazuje konfigurację i testy dla mierzonej populacji. |
-| [meta](meta/README.md) | Test Events i reguły odbiorców | Odbiór testowy i konfiguracja. Liczebność i efekt kampanii poza zakresem. |
-| [clarity](clarity/README.md) | Weryfikacja instalacji, zamaskowane nagranie i dwie mapy | Można ocenić zdarzenia z tej sesji i przykładowe zachowania. |
-| `zgody/` | Zakładka Consent w GTM oraz Network dla każdego wariantu i po wycofaniu | Obserwacja żądań w konkretnych profilach testowych. |
+| Projektowanie i budowa | Arkusze testu makiety i LP z drugą parą, zmiana i powtórzenie, decyzje AI obu studentów | Zrozumienie i zachowania w konkretnej próbie |
+| Publikacja | Publiczny HTTPS i zrzuty 390/1366 px na wdrożeniu | Dostępność wersji w czasie próby |
+| [GTM](gtm/README.md) | Preview, zdarzenie CMP, triggery, stan zgód, widoczność i końcowy eksport JSON | Uruchomienie tagów oraz zapisana konfiguracja |
+| [GA4](ga4/README.md) | DebugView, odbiór `generate_lead` z parametrem, negatywny test, odmowa, eksploracje, Realtime i sześć prób | Odbiór i wyniki w populacji pomiarowej, bez wniosku o skuteczności biznesowej |
+| [Meta](meta/README.md) | Test Events PageView/Lead, próby błędne i reguła grupy | Odbiór i zakres grupy, bez wniosku o jej skali |
+| [Clarity](clarity/README.md) | Oficjalny tag, `metadata`, Strict, zamaskowane nagranie i mapy | Instalacja i obserwowane zachowanie, bez wniosku o motywacji |
+| Zgody | Preview i Network dla E01–E08, osobno przypadki po przeładowaniu | Blokowanie transmisji i zgodność sygnałów w testowych profilach |
 
-Dla każdego dodanego dowodu podajcie datę, adres, wersję opublikowaną, warunki zgód i ID testu. Zapiszcie oczekiwany i rzeczywisty wynik. Zanonimizujcie dane dostępu i identyfikatory użytkowników testowych.
+Dodajcie datę, scenariusz, URL, wersję, stan zgód, wynik i ograniczenie pod każdym dowodem. W publicznych materiałach pomińcie dane dostępu oraz identyfikatory prywatne.

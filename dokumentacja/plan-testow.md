@@ -1,53 +1,59 @@
 # Plan testów i wyniki
 
-Wyniki lokalne z 14.11.2026 pochodzą z Playwright i Chromium. Uruchamiajcie scenariusze w świeżych profilach na fikcyjnych danych. [Raport maszynowy](../dowody/wyniki-lokalne.json) zawiera wersję przeglądarki, dokładny czas i wynik każdej grupy. Identyfikatory połączone w logu wskazują wspólne wykonanie. Każdy scenariusz lokalny sprawdza też brak zewnętrznych żądań, prób wysłania i błędów JS w konfiguracji bez ID GTM.
+## Wyniki lokalne
 
-## Testy lokalne
+14.11.2026, Playwright i Chromium. Test lokalny potwierdza JS, DOM i geometrię. W scenariuszach CMP użyto kontrolowanego obiektu o interfejsie Cookiebot, z pustym identyfikatorem GTM. W całym przebiegu kontrolowano brak błędów JS, POST i zewnętrznych żądań. [Bieżący log](../dowody/wyniki-lokalne.json) · [Historia v1](../dowody/historia/v1/README.md)
 
-| ID | Warunek początkowy | Kroki | Oczekiwane | Rzeczywiste | Status | Dowód i ograniczenie |
+| ID | Warunek i kroki | Oczekiwany wynik | Rzeczywisty wynik | Status | Dowód i zakres |
+| --- | --- | --- | --- | --- | --- |
+| F01 | Lokalna odmowa; użyj trzech kotwic i prywatności | Cele na stronie i podstrona | Kotwice i prywatność działały | PASS | JSON; localhost |
+| F02/A02 | Kliknij 3 CTA | Wspólny cel, fokus i oddzielne lokalizacje | Trzy lokalizacje i fokus na formularzu | PASS | JSON; lokalna kolejka |
+| F03 | Otwórz i zamknij FAQ klawiszami Space i Enter | Widoczne odpowiedzi i zwinięcie | 7 pytań zgodnych | PASS | JSON; Chromium |
+| F04 | 320, 390, 768, 1366 px; otwórz i zamknij menu klawiaturą | Brak przewijania w poziomie i poprawny fokus | Cztery szerokości zgodne | PASS | [390 px](../dowody/lp/mobile.png), [1366 px](../dowody/lp/desktop.png); emulacja |
+| F05/F06 | Lokalna odmowa; formularz klawiaturą z fikcyjnymi danymi | Fokus na sukcesie, pola puste, lokalny sygnał, brak ruchu sieciowego | Potwierdzenie i jeden lokalny sukces | PASS | JSON; bez dostawców |
+| F07/A04 | Fokus, pusta próba, następnie edycja i błędny e-mail | 0 startów po pustej próbie, 1 po edycji, 0 sukcesów | Zgodne liczby i błędy | PASS | [Zrzut](../dowody/formularz/negatywny.png) i JSON; lokalnie |
+| F08/A05/A06 | Poprawne fikcyjne dane, dwuklik | Jeden `lead_success`, przycisk disabled, brak wartości pól w URL, storage i kolejce | Zgodny komunikat, blokada, pojedynczy wpis, brak danych w kontrolowanych miejscach | PASS | [Zrzut](../dowody/formularz/sukces.png) i JSON; lokalnie |
+| A01 | Wejście UTM, CTA, poprawny formularz | Wejściowe UTM pozostają. Bez zdarzeń dostawców w kolejce | Brak lokalnego `page_view`, `section_view`, `generate_lead` i `Lead` | PASS | JSON; automatyczna odsłona GA4 osobno |
+| A03-390, A03-1366 | Wyświetl podsumowanie w 390×670 i 1366×900 | Co najmniej 50% widoczne, brak lokalnej emisji | 265/670 i 320/900 px, oba bloki w 100% widoczne, po 2100 ms brak lokalnego `section_view` | PASS | JSON; geometria, reguła GTM osobno |
+| A07 | Dotarcie przez przewinięcie | Start i sukces bez CTA | `form_start → lead_success` | PASS | JSON; pełny lejek w GA4 do wykonania |
+| Z01/Z02 | Nowy profil, potem odmowa i odświeżenie | Baner tylko przed decyzją, brak sieci do dostawców | Odmowa zapisana | PASS | JSON; panel lokalny |
+| Z03/Z04/Z05 | Częściowe decyzje i obie kategorie, odświeżenie | Wybór zachowany, sygnały wyłącznie lokalne | Trzy ustawienia zgodne | PASS | JSON; bez CMP/GTM |
+| Z06/Z08/Z09 | Odbierz zgodę, sprawdź drugą kartę i wymuszony błąd zapisu | Odczyt nowej decyzji po odświeżeniu | Scenariusze zgodne w trybie lokalnym | PASS | [Zrzut](../dowody/zgody/zmiana-wyboru.png) i JSON; lokalnie |
+| CMP01 | Tryb docelowy bez ID, pusta decyzja, sukces i późniejszy sygnał CMP | Bez lokalnego banera, sukces nadal możliwy, brak odtworzenia | Zgodne | PASS | JSON; podstawiony obiekt, bez Cookiebot |
+| CMP02/CMP03 | Podaj oddzielnie statystykę i marketing, użyj preferencji | Wywołanie renew, CTA/start tylko dla analityki, sukces dla uprawnionej kategorii | Oba scenariusze zgodne | PASS | JSON; podstawiony obiekt, brak transmisji dostawców |
+| CMP04 | Podaj obie zgody, następnie podwójną notyfikację odmowy | Jedno przeładowanie i brak pętli | Jedno przeładowanie i odmowa w nowym dokumencie | PASS | JSON; podstawiony obiekt, brak transmisji dostawców |
+
+## Próby z GTM, GA4, Meta i Clarity
+
+Warunek ogólny to właściwy publiczny HTTPS, skonfigurowane konta i ostatnia wersja plików. Używajcie świeżego profilu oraz danych fikcyjnych. Zbierajcie osobno sygnał, wyzwolenie tagu i odbiór. W Network zaznaczcie **Preserve log**. Dowody mają opisy, wersję i datę. Rozróżnijcie zasoby infrastruktury (GTM, Cookiebot, Preview) i hity pomiarowe (`/g/collect`, `facebook.com/tr`, `*.clarity.ms`).
+
+| ID | Kroki i warunek | Oczekiwane | Wynik rzeczywisty | Status | Dowód i zakres |
+| --- | --- | --- | --- | --- | --- |
+| P01 | Otwórz publiczny URL w drugiej przeglądarce i sprawdź 390/1366 px | HTTPS, zasoby i interakcje działają | [uzupełnijcie] | NOT TESTED | dowody/lp; wersja i czas |
+| G01 | Preview; po zapisanej zgodzie analitycznej odśwież od góry i kliknij dwa CTA | Jedna automatyczna odsłona i dwa `cta_click` z różnymi lokalizacjami | [uzupełnijcie] | NOT TESTED | dowody/gtm + ga4; Tag Assistant i DebugView |
+| G02 | Zgoda zapisana, zacznij od góry. Krótka próba <2 s i oddzielne wczytanie z 50% przez ≥2 s. Wyjdź i wróć w drugiej próbie | 0 i 1 `section_view`; poprawne `section_id`, powrót nie powiela | [uzupełnijcie] | NOT TESTED | dowody/gtm + ga4; Percent Visible, czas, DebugView; nie dowodzi lektury |
+| G03 | Pusta próba, potem edycja błędnego e-maila i ponowne wysłanie | Najpierw 0 `form_start`, później 1; 0 sukcesów we wszystkich warstwach | [uzupełnijcie] | NOT TESTED | dowody/formularz + gtm + ga4; negatywny dowód z sesji |
+| G04 | Poprawne fikcyjne dane, obie zgody, dwuklik | Jedno `lead_success`, jeden `generate_lead` i jeden Meta `Lead` | [uzupełnijcie] | NOT TESTED | dowody/ga4 + meta; odbiór oraz parametry bez wartości pól |
+| G05 | Opublikuj właściwą wersję i otwórz LP w świeżym profilu poza Preview | Realtime, poprawne tagi i dostępny finalny JSON | [uzupełnijcie] | NOT TESTED | dowody/gtm i ga4, gtm/container-published.json; konkretna wersja |
+| G06 | Ukończ 6 prób UTM; zbuduj eksploracje i sprawdź wymiary i zdarzenie kluczowe | Poprawna konfiguracja, uzupełnione rzeczywiste N1/N2/N3 i CTA po przetworzeniu | [uzupełnijcie] | NOT TESTED | dowody/ga4; testowy okres i populacja |
+| M01 | Sam marketing; testuj PageView, puste/błędne dane, poprawny dwuklik | Jeden PageView, brak błędnych Lead, jeden poprawny Lead | [uzupełnijcie] | NOT TESTED | dowody/meta; Test Events i Network |
+| M02 | Utwórz grupę witryny i wykluczenie Lead | Zakres LP oraz dwa okna po 30 dni | [uzupełnijcie] | NOT TESTED | dowody/meta; zrzut reguł bez potwierdzania skali |
+| C01 | Oficjalny tag, Strict, tylko analityka; test metadata i nowe nagranie | Analityka GRANTED, reklama DENIED; wartości pól nieczytelne | [uzupełnijcie] | NOT TESTED | dowody/clarity; stan, instalacja, konkretne nagranie |
+| C02 | Próba drugiej pary na LP; odszukaj czas, urządzenie i mapy | Nagranie i dostępne mapy, obserwacja i alternatywna hipoteza | [uzupełnijcie] | NOT TESTED | dowody/clarity; liczba sesji, ograniczona interpretacja |
+
+## Macierz zgód na opublikowanym LP
+
+Powtórzcie w Preview i po publikacji. „Działa” oznacza oczekiwaną możliwość uruchomienia przy pasującej regule. Dla czterech stanów Consent Mode kolejność kolumn w nawiasie to `analytics_storage / ad_storage / ad_user_data / ad_personalization`.
+
+| ID i wybór | Oczekiwany Consent Mode | GA4 | Meta | Clarity | Faktyczny wynik, dowód Preview i Network | Status |
 | --- | --- | --- | --- | --- | --- | --- |
-| F01 | Desktop, odmowa | Otwórz Program, Organizacja, FAQ i Prywatność | Właściwe cele, strona prywatności bez pomiaru | Trzy hashe i podstrona prawidłowe | PASS | JSON F01. Lokalny serwer. |
-| F02 | Desktop, analityka | Użyj każdego z trzech CTA | Ten sam formularz i fokus na jego nagłówku | Prawidłowe cele i fokus | PASS | JSON F02/A02. Test jednego silnika. |
-| F03 | Odmowa | Otwórz spacją i zamknij Enterem każde pytanie | Widoczne odpowiedzi i działające zwijanie | Zmienił się stan wszystkich siedmiu pytań | PASS | JSON F03. Klawiatura Chromium. |
-| F04 | Odmowa, cztery rozmiary | Zmień szerokość na 320/390/768/1440. Enter otwiera menu, Escape zamyka | Brak przewijania poziomego, powrót fokusu | Zgodne we wszystkich szerokościach | PASS | JSON F04, [zrzut mobilny](../dowody/lp/mobile.png). Emulacja. |
-| F05 | Odmowa, bez myszy | Enter na hero, Tab po polach, wybierz opcję i wyślij Enterem | Poprawna kolejność i fokus na sukcesie | Formularz ukończony i fokus ustawiony | PASS | JSON F05/F06. Bez audytu czytnika ekranu. |
-| F06 | Odmowa | Podaj fikcyjne imię, poprawny e-mail i doświadczenie | Sukces, czyste pola, brak leada analitycznego | Potwierdzono sukces, czyste pola i zero leadów | PASS | JSON F05/F06. Dotyczy lokalnego stanu. |
-| F07 | Zgoda analityczna | Wyślij puste pola, następnie błędny e-mail | Błędy i fokus, brak sukcesu | Trzy błędy dla pustego formularza, błąd e-maila, zero sukcesu | PASS | JSON F07/A04 i [zrzut błędu](../dowody/formularz/negatywny.png). |
-| F08 | Obie zgody | Wypełnij i kliknij przycisk dwukrotnie | Jeden stan sukcesu | Jeden sukces oraz jeden wpis leada | PASS | JSON F08/A05/A06 i [zrzut sukcesu](../dowody/formularz/sukces.png). Dotyczy jednego dokumentu. |
-| A01 | URL z query i hash | Przyznaj analitykę, użyj CTA, odśwież stronę | Jedna odsłona na dokument, URL bez query i hash | Jeden wpis z oczekiwanymi wartościami | PASS | JSON A01. Nie sprawdza automatycznych hitów Google tag. |
-| A02 | Analityka | Kliknij trzy główne CTA | Trzy wartości id i lokalizacji, wspólna treść CTA | Zgodna kolejność i komplet parametrów | PASS | JSON F02/A02. Warstwa lokalna. |
-| A03 | Analityka, 390×670 i 1440×900 | Wejdź w sekcję na 300 ms, wyjdź, wróć na ponad sekundę, wejdź ponownie | Pierwszy krótki widok pominięty, potem pojedyncze zdarzenie | Zgodne przy proporcjach 1070/670 i 742/900 px | PASS | JSON A03-390/1440. Czas i geometria, bez pomiaru uwagi. |
-| A04 | Analityka | Ustaw fokus na polu, spróbuj wysłać pusty formularz, edytuj i powtórz | Fokus sam nie mierzy, jedna próba po interakcji | 0 po fokusie, 1 po interakcji | PASS | JSON F07/A04. Automatyczne zdarzenia GA4 sprawdzi G02. |
-| A05 | Obie zgody | Wypełnij i wyślij poprawnie; osobno powtórz scenariusz błędny F07 | Lead po sukcesie w poprawnej próbie, brak po błędzie | Jedna pełna sekwencja i zero leadów przy błędach | PASS | JSON F08/A05/A06 i F07/A04. Odbiór osobno. |
-| A06 | Obie zgody | Użyj wyróżniających danych fikcyjnych, zapisz i kliknij dwukrotnie | Brak powtórzeń, brak danych w dataLayer, URL i pamięci | Wartości wejściowe nie występują w kontrolowanych miejscach | PASS | JSON F08/A05/A06. Hity dostawców wymagają rzeczywistej instalacji. |
-| Z01 | Bez decyzji | Otwórz stronę, pozostaw baner | Domyślne false/false i brak pomiaru | Stan false/false, brak żądań zewnętrznych | PASS | JSON Z01/Z02. Bez skonfigurowanego ID. |
-| Z02 | Brak decyzji | Odrzuć i przeładuj | Brak banera i zdarzeń biznesowych | Zapamiętana odmowa, 0 zdarzeń | PASS | JSON Z01/Z02. Bez skonfigurowanego ID. |
-| Z03 | Brak decyzji | Wybierz tylko analitykę, odśwież, ukończ | Jedna lokalna odsłona GA4, gotowość analityki, jeden lead, brak gotowości Meta | Stan i kolejka zgodne | PASS | JSON Z03. Warstwa lokalna. |
-| Z04 | Brak decyzji | Wybierz tylko marketing, odśwież, ukończ | Gotowość Meta, jeden wspólny lead, 0 odsłon GA4 i startów | Stan i kolejka zgodne | PASS | JSON Z04. Warstwa lokalna. |
-| Z05 | Brak decyzji | Akceptuj wszystko, odśwież, ukończ | Obie gotowości, jeden wspólny lead | Potwierdzono oba sygnały i jeden lead | PASS | JSON Z05. Warstwa lokalna. |
-| Z06 | Obie zgody zapisane | Odznacz analitykę, potem odrzuć marketing | Dwa przeładowania i odpowiedni stan po każdym | Przeładowania i stan zgodne | PASS | JSON Z06 i [zrzut ustawień](../dowody/zgody/zmiana-wyboru.png). Bez bibliotek dostawców. |
-| Z07 | Odmowa | Kliknij CTA, ukończ, następnie akceptuj wszystko | Pomiar bieżącego widoku i zero odtworzonych działań | Jedna odsłona, zero historycznych zdarzeń | PASS | JSON Z07. Warstwa lokalna. |
-| Z08 | Dwie karty przy obu zgodach | Odrzuć w pierwszej karcie | Druga przeładuje się z odmową | Druga karta nie dodała sygnałów pomiaru | PASS | JSON Z08. Jeden profil Chromium. |
-| Z09 | Zapisane zgody, wymuszony błąd zapisu | Odrzuć i poczekaj na nawigację | Nowy dokument odmawia pomiaru | Brak gotowości tagów, stary zapis usunięty w teście | PASS | JSON Z09. Test wymusza błąd `setItem`, przy działającym `removeItem`. |
-| A07 | Tylko analityka, bez kliknięcia CTA | Przewiń do formularza, przejdź poprawną próbę | Odsłona, start i lead, brak CTA | Kolejka ma oczekiwaną sekwencję | PASS | JSON A07. Warstwa lokalna. |
+| E01 Brak decyzji | D/D/D/D | Blokada | Blokada | Blokada | [uzupełnijcie] | NOT TESTED |
+| E02 Odmowa wszystkich i odświeżenie | D/D/D/D | Blokada | Blokada | Blokada | [uzupełnijcie] | NOT TESTED |
+| E03 Tylko analityka | G/D/D/D | Działa | Blokada | Działa, reklama DENIED | [uzupełnijcie] | NOT TESTED |
+| E04 Tylko marketing | D/G/G/G | Blokada | Działa | Blokada | [uzupełnijcie] | NOT TESTED |
+| E05 Obie kategorie | G/G/G/G | Działa | Działa | Działa | [uzupełnijcie] | NOT TESTED |
+| E06 Odbierz analitykę po obu, po przeładowaniu | D/G/G/G | Blokada | Działa | Blokada | [uzupełnijcie] | NOT TESTED |
+| E07 Odbierz marketing po obu, po przeładowaniu | G/D/D/D | Działa | Blokada | Działa, reklama DENIED | [uzupełnijcie] | NOT TESTED |
+| E08 Odbierz obie, po przeładowaniu | D/D/D/D | Blokada | Blokada | Blokada | [uzupełnijcie] | NOT TESTED |
 
-## Testy na opublikowanej stronie
-
-Każdy poniższy test czeka na rzeczywisty HTTPS, kontener oraz usługę wymienioną w warunkach. Po wykonaniu wpiszcie faktyczny wynik, status i ścieżkę do dowodu. Dla testów sieci otwórzcie DevTools → Network przed wejściem na stronę, włączcie Preserve log i wyczyśćcie dane witryny przed każdym wariantem. Sprawdzajcie hosty Google Tag Manager i Google Analytics, `connect.facebook.net`, żądania Pixela do Facebooka oraz `*.clarity.ms`. Przy odmowie zweryfikujcie również próbę poza Preview. Sygnałów samego narzędzia debugującego nie liczcie jako hitów LP. Eksporty HAR mogą zawierać informacje techniczne przeglądarki. Do oddania wybierzcie zanonimizowane fragmenty.
-
-| ID | Warunek początkowy | Kroki | Oczekiwane | Rzeczywiste | Status | Miejsce na dowód i ograniczenie |
-| --- | --- | --- | --- | --- | --- | --- |
-| G00 | Wdrożenie Pages | Otwórz URL na telefonie i desktopie, sprawdź zasoby, kotwice, prywatność | HTTPS, pełny render, obsługa interakcji | [uzupełnij] | NOT TESTED | `dowody/lp/`. Konkretny moment i wersja. |
-| G01 | GTM z tagami, Preview, zgody zgodnie ze zdarzeniami | Wykonaj sekwencję CTA–program–formularz oraz negatywny formularz | Poprawna kolejność i parametry, brak tagów leada po błędzie | [uzupełnij] | NOT TESTED | `dowody/gtm/`. Wyzwolenie tagów nie potwierdza odbioru. |
-| G02 | GA4, Preview, wyłączony Enhanced Measurement | Włącz analitykę, kliknij kilka CTA, pokaż program, wpisz błąd, następnie zakończ | 5 nazw zdarzeń w DebugView, po jednej odsłonie i konwersji, start bez duplikacji, brak treści pól | [uzupełnij] | NOT TESTED | `dowody/ga4/`. Odbiór tej sesji debug. |
-| G03 | Usługa GA4 z testowymi danymi | Sprawdź wymiary, zdarzenie kluczowe, oba lejki, widoczność i tabelę CTA | Zgodne definicje i widoczna konfiguracja eksploracji | [uzupełnij] | NOT TESTED | `dowody/ga4/`. Ruch testowy nie określa skuteczności. |
-| E01 | Instalacja, zgody usunięte | Wejdź bez wyboru, potem odrzuć, odśwież i ukończ formularz | Brak GTM i wszystkich hitów, demonstracyjny sukces | [uzupełnij] | NOT TESTED | `dowody/zgody/`. Obserwowane żądania i cookies w testowym profilu. |
-| E02 | Świeży profil | Wybierz tylko analitykę, odśwież, ukończ | GA4 i Clarity działają, brak Meta | [uzupełnij] | NOT TESTED | `dowody/zgody/`. Network i zgody w Preview. |
-| E03 | Świeży profil | Wybierz tylko marketing, odśwież, ukończ | Meta PageView/Lead, brak GA4 i Clarity | [uzupełnij] | NOT TESTED | `dowody/zgody/`. Network i zgody w Preview. |
-| E04 | Świeży profil | Akceptuj wszystko, odśwież, ukończ, sprawdź ładunki | Wszystkie narzędzia uruchomione, jeden lead po stronie każdego odbiorcy, brak wartości pól | [uzupełnij] | NOT TESTED | `dowody/zgody/`. Dane testowe w DevTools. |
-| E05 | Wszystkie narzędzia uruchomione | Wycofaj tylko analitykę, po przeładowaniu wykonaj działania i sprawdź hity; powtórz dla marketingu w osobnej próbie, potem odrzuć oba | Nowy dokument utrzymuje pozostałą kategorię i blokuje odwołane tagi. Zanotuj oddzielnie ewentualne żądania rozpoczęte przed zmianą lub kończące stary dokument | [uzupełnij] | NOT TESTED | `dowody/zgody/`. Network w oknie przeładowania i po nim. |
-| G06 | Zaliczone testy, uprawnienia do GTM | Opublikuj, sprawdź Versions, pobierz JSON, wykonaj test poza Preview | JSON z opublikowanej wersji i pozytywna weryfikacja | [uzupełnij] | NOT TESTED | `gtm/container-published.json` oraz `dowody/gtm/`. Zgodność z wersją w chwili eksportu. |
-| M01 | Prawdziwy Pixel, Events Manager | Przy samym marketingu sprawdź PageView, puste i błędne pola oraz poprawny formularz z dwuklikiem | Jedno PageView, zero negatywnych Lead, jeden poprawny Lead | [uzupełnij] | NOT TESTED | `dowody/meta/`. Test Events i Diagnostics. |
-| M02 | Dostęp do Audiences | Utwórz grupę LP 30 dni, wyklucz Lead 30 dni | Właściwe źródło, ścieżka i wykluczenie | [uzupełnij] | NOT TESTED | `dowody/meta/`. Reguły nie określają skali grupy. |
-| C01 | Clarity, Strict masking | Uruchom z analityką, wypełnij próbę, sprawdź odbiór i nagranie | Nagranie dostępne, wartości pól i obszar formularza zamaskowane | [uzupełnij] | NOT TESTED | `dowody/clarity/`. Nagranie danej próby. |
-| C02 | Dostępne nagrania, ruch próbny na LP | Otwórz mapy kliknięć i przewijania, rozbij urządzenia | Mapy konkretnego URL i jedna obserwacja z warunkiem weryfikacji | [uzupełnij] | NOT TESTED | `dowody/clarity/`. Mała próba może ograniczyć interpretację. |
+Używajcie różnych czystych profili dla niezależnych wierszy. W E06–E08 najpierw sprawdźcie uruchomienie bibliotek przy pełnej zgodzie, potem jedno przeładowanie, właściwy zapis, brak hitów odwołanych usług i aktualne sygnały Clarity. Zapiszcie ewentualne żądania zainicjowane wcześniej, widoczne przy zamykaniu starego dokumentu. `D` oznacza denied, `G` granted. [Gdzie zapisać dowody](../dowody/README.md)

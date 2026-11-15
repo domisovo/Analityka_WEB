@@ -1,91 +1,77 @@
-# Konfiguracja GTM, GA4, Meta i Clarity
+# GTM, Cookiebot, GA4, Meta i Clarity
 
-| Pole | Wartość do uzupełnienia |
+| Wartość | Do uzupełnienia z panelu |
 | --- | --- |
-| Publiczny HTTPS | [adres LP] |
-| Kontener web | [ID GTM z nagłówka Workspace] |
-| GA4 | [nazwa usługi i Measurement ID] |
-| Meta | [nazwa źródła i identyfikator Pixela] |
-| Clarity | [nazwa i identyfikator projektu] |
-| Opublikowana wersja GTM | [numer, data] |
+| Publiczny URL HTTPS | [adres i dokładna ścieżka LP] |
+| GTM Web | [Container ID] |
+| Cookiebot | [domena i Domain Group ID] |
+| GA4 | [usługa, strumień WWW, Measurement ID] |
+| Meta | [źródło zespołu i Pixel ID] |
+| Clarity | [projekt i Project ID] |
+| Wersja opublikowana GTM | [numer, opis, data] |
 
-## 1. Kontener i prywatność
+## 1. Cookiebot i podstawowy Consent Mode v2
 
-1. Utwórzcie jeden kontener Web w GTM i nadajcie członkom zespołu właściwe uprawnienia przez platformę. W **Admin → Container Settings** włączcie **Consent Overview**.
-2. Dodajcie jeden lokalny szablon tagu `EquiSoul Consent Bridge` według [kodu i uprawnień](kod-tagow.md). Dodajcie dwie instancje tego szablonu. Tag `CONSENT | Default denied` z zaznaczonym polem `isDefault` uruchamiajcie na **Consent Initialization – All Pages**. Tag `CONSENT | Apply choice` z odznaczonym polem uruchamiajcie na `CE | Consent update`. W obu wybierzcie **No additional consent required**. Te tagi ustawiają stan bez ładowania bibliotek.
-3. W kodzie strony wpiszcie ID kontenera w `strona/js/config.js`. Nie dodawajcie standardowego snippetu GTM, iframe noscript, osobnego Google tag, Pixela ani Clarity do HTML. Loader projektu wstawia jeden skrypt po przynajmniej jednej zgodzie.
-4. Opublikujcie pliki przez GitHub Pages i sprawdźcie ścieżkę produkcyjną. Najpierw testujcie konfigurację z **Preview**, zanim opublikujecie wersję kontenera. W nowym kontenerze nie wstawiajcie niesprawdzonych tagów z innych projektów.
+1. W GTM utwórzcie osobny kontener **Web**. W **Admin → Container Settings** włączcie **Consent Overview**. W Cookiebot dodajcie dokładny host publicznego LP, sprawdźcie skan, plan i dostęp zespołu. Ustawcie język polski, odmowę, akceptację oraz wybór kategorii.
+2. Zaimportujcie z galerii szablon **Cookiebot CMP**. Utwórzcie tag `CMP – Cookiebot` z Domain Group ID, trybem ręcznego blokowania i regułą **Consent Initialization – All Pages**. Włączcie Google Consent Mode. Ustawcie globalnie `denied` dla `analytics_storage`, `ad_storage`, `ad_user_data`, `ad_personalization`. Statystyka steruje pierwszym stanem, marketing trzema następnymi. Sam tag CMP jest niezbędny i nie wymaga zgody opcjonalnej. [Instalacja Cookiebot w GTM](https://support.cookiebot.com/hc/en-us/articles/360003793854-Google-Tag-Manager-deployment)
+3. W **Triggers** dodajcie **CE – consent update**, typ **Custom Event**, dokładna nazwa `cookie_consent_update` emitowana przez Cookiebot. Regułę ograniczcie przez Page Path według sekcji 2. Stany na tym zdarzeniu sprawdźcie w Preview. Same reguły All Pages nie wykonują się ponownie po pierwszej zgodzie. [Konfiguracja wariantu podstawowego](https://support.cookiebot.com/hc/en-us/articles/14448386844700-Configuring-tags-for-basic-consent-mode)
+4. Po skonfigurowaniu reguł ustawcie `consentMode: 'cookiebot'` i prawdziwe ID w `strona/js/config.js`. Adapter w `head` inicjuje istniejące `dataLayer` i pobiera GTM **przed decyzją** na LP i prywatności. Ze snippetu GTM dodajcie wymagany w spotkaniu 3 rzeczywisty iframe `noscript` tuż po otwarciu `body` obu stron, tylko podczas wdrożenia Cookiebot. Przy wyłączonym JS nie udzieli on zgody i żadne tagi pomiarowe nie mogą się wtedy wykonać. Zweryfikujcie to w Network. Adapter już pełni funkcję skryptowej części snippetu; użyjcie jednego loadera. [Instalacja kontenera](https://support.google.com/tagmanager/answer/6103696)
+5. Przycisk „Ustawienia prywatności” wywołuje `Cookiebot.renew()` po dostępności CMP. Adapter śledzi `CookiebotOnConsentReady`, `CookiebotOnAccept`, `CookiebotOnDecline`, porównuje stan i po odebraniu przyznanej kategorii przeładowuje dokument po zapisaniu decyzji. Przed przeładowaniem blokuje nowe sygnały aplikacji i w miarę dostępności ustawia opt-out GA4, zatrzymuje Clarity oraz wycofuje zgodę Pixela dla wycofywanej kategorii. W nowym dokumencie dodatkowe wymogi w GTM blokują odpowiednie biblioteki. Sprawdźcie też zmianę zgody w drugiej karcie oraz ewentualne żądania w trakcie przeładowania, odróżniając je od nowych żądań po przeładowaniu. [API Cookiebot](https://www.cookiebot.com/en/developer/) · [GA4 opt-out](https://developers.google.com/tag-platform/security/guides/privacy)
+6. Pozostawcie Cookiebot jako jedyne źródło stanu zgód. Usuńcie wcześniejsze tagi `CONSENT | EquiSoul Bridge`, `Default denied` i `Apply choice`, jeśli były tworzone według starszej instrukcji. W trybie `local` działa tylko demonstracyjny panel i lokalna kolejka. Nawet po wyborze zgód tryb lokalny nie pobiera GTM ani dostawców. W aktywnym Cookiebot ruch skryptu GTM i CMP przed decyzją jest oczekiwany. Brak hitów GA4, Meta i Clarity trzeba potwierdzić oddzielnie.
 
-`analytics_storage` odpowiada kategorii analitycznej. `ad_storage`, `ad_user_data` i `ad_personalization` odpowiadają kategorii marketingowej. Most korzysta z API GTM i jawnie ustawia odmowę w Consent Initialization. Zmiana zgód jest przetwarzana przed następnymi zdarzeniami z kolejki. Tagi dostawców mają dodatkowe kontrole zgody oraz warunki reguł. Przy wycofaniu strona zmienia stan w pamięci, próbuje zatrzymać uruchomione narzędzia, czyści dostępne cookies wycofanej kategorii i przeładowuje stronę. [Wariant podstawowy](https://developers.google.com/tag-platform/security/concepts/consent-mode), [szablony zgody GTM](https://developers.google.com/tag-platform/tag-manager/templates/consent-apis), [opty-out GA4](https://developers.google.com/tag-platform/security/guides/privacy)
+## 2. Zmienne, reguły i tagi
 
-### Warstwa zmiennych
-
-Wszystkie zmienne DLV mają typ **Data Layer Variable**, wersja 2. Przy wartościach logicznych w warunku **equals true** sprawdźcie w Preview, że zmienna ma typ Boolean.
-
-| Nazwa zmiennej | Klucz / wartość |
+| Nazwa | Typ i źródło |
 | --- | --- |
-| DLV \| consent_analytics | `consent_analytics` |
-| DLV \| consent_marketing | `consent_marketing` |
-| DLV \| page_location | `page_location` |
-| DLV \| page_title | `page_title` |
-| DLV \| cta_id | `cta_id` |
-| DLV \| cta_location | `cta_location` |
-| DLV \| cta_text | `cta_text` |
-| DLV \| section_id | `section_id` |
-| DLV \| form_id | `form_id` |
-| CONST \| GA4 ID | Stała z rzeczywistym ID pomiaru GA4 |
-| CONST \| Meta ID | Stała z rzeczywistym ID Pixela |
-| CONST \| Clarity ID | Stała z rzeczywistym ID projektu |
+| CONST – GA4 ID | Stała, rzeczywisty Measurement ID |
+| CONST – Meta ID | Stała, rzeczywisty Pixel ID |
+| DLV – cta_location | Data Layer Variable v2, klucz `cta_location` |
+| DLV – form_id | Data Layer Variable v2, klucz `form_id` |
 
-### Reguły i tagi
+Dla `CE – consent update` użyjcie warunku **Page Path matches RegEx** obejmującego dokładny katalog LP z końcowym ukośnikiem lub `index.html` (bez domeny, query i `privacy.html`). Przykład dla publikacji w podkatalogu `/projekt/`: `^/projekt/(?:index\.html)?$`. Dla witryny w korzeniu: `^/(?:index\.html)?$`. Filtr ścieżki zastosujcie też w trzech regułach sygnałów strony. Włączcie wbudowane zmienne **Page Path**, **Percent Visible**, **On-Screen Duration**.
 
-Reguły `CE` mają typ **Custom Event**, dopasowanie dokładne, bez regexu. Kolumna „Warunek” dotyczy DLV, a kolumna „Zgody” opisuje **Require additional consent for tag to fire**. `A` to `analytics_storage`, a `M` to wszystkie trzy `ad_*` z mapowania powyżej.
+**A** oznacza dodatkowe wymaganie `analytics_storage`. **M** oznacza komplet dodatkowych wymagań `ad_storage`, `ad_user_data`, `ad_personalization`. Ustawcie **Require additional consent for tag to fire**, nawet gdy tag ma wbudowane sprawdzanie zgód.
 
-| Reguła | Zdarzenie | Warunek | Tag | Zgody |
+| Reguła GTM | Typ i warunek | Tag | Parametry / krotność | Zgody |
 | --- | --- | --- | --- | --- |
-| Consent Initialization – All Pages | inicjalizacja | każde | CONSENT \| Default denied | — |
-| CE \| Consent update | equisoul_consent_update | każde | CONSENT \| Apply choice | — |
-| CE \| Analytics ready | equisoul_analytics_ready | consent_analytics = true | GA4 \| Google tag, CLARITY \| Init | A |
-| CE \| GA4 page_view | page_view | consent_analytics = true | GA4 \| page_view | A |
-| CE \| GA4 cta_click | cta_click | consent_analytics = true | GA4 \| cta_click | A |
-| CE \| GA4 section_view | section_view | consent_analytics = true | GA4 \| section_view | A |
-| CE \| GA4 form_start | form_start | consent_analytics = true | GA4 \| form_start | A |
-| CE \| GA4 generate_lead | generate_lead | consent_analytics = true | GA4 \| generate_lead | A |
-| CE \| Marketing ready | equisoul_marketing_ready | consent_marketing = true | META \| Init + PageView | M |
-| CE \| Meta Lead | generate_lead | consent_marketing = true | META \| Lead | M |
+| CE – consent update | Custom Event `cookie_consent_update` na LP | GA4 – Google tag | Tag ID z CONST, raz na stronę; automatyczne `page_view` | A |
+| CE – cta_click | Custom Event `cta_click` | GA4 – cta_click | `cta_location={{DLV – cta_location}}`, raz na zdarzenie | A |
+| CE – form_start | Custom Event `form_start` | GA4 – form_start | `form_id={{DLV – form_id}}`, raz na zdarzenie | A |
+| CE – lead_success | Custom Event `lead_success` | GA4 – generate_lead | `form_id={{DLV – form_id}}`, raz na zdarzenie | A |
+| EV – program summary | Element Visibility, ID `workshop_program_summary`, bez `#` | GA4 – section_view | `section_id=workshop_program_summary`, raz na stronę; 50% przez 2000 ms | A |
+| CE – consent update | Jak wyżej | META – base and PageView | Kod pobrany z Meta, jeden PageView, taga raz na stronę | M |
+| CE – lead_success | Jak wyżej | META – Lead | Jeden Lead; base jako tag konfigurujący | M |
+| CE – consent update | Jak wyżej | CLARITY – Official | Project ID, raz na stronę | A |
 
-`GA4 | Google tag` to typ **Google tag**, `{{CONST | GA4 ID}}`. Ustawcie **Once per page** i skonfigurujcie `GA4 | Publish ID` jako setup tag dla Google tag, zgodnie z [kodem](kod-tagow.md). W **Configuration settings** ustawcie `send_page_view = false`, `page_location = {{DLV | page_location}}`, `page_title = {{DLV | page_title}}`, `allow_google_signals = false`, `allow_ad_personalization_signals = false`. Użyjcie wartości false jako Boolean, np. zmiennej Custom JavaScript zwracającej literal `false` przy polu bez przełącznika logicznego. Nie podłączajcie dodatkowych miejsc docelowych do Google tag. W Preview sprawdźcie, że `GA4 | Google tag` jest inicjowany na `equisoul_analytics_ready` przed `page_view`. Nie dodawajcie kolejnej kopii Google tag do samego zdarzenia.
+**Widoczność.** Włączcie minimum on-screen duration 2000 ms, pozostawcie **Observe DOM changes** wyłączone dla statycznego bloku. GTM sumuje czas powyżej progu w danym wyświetleniu. Krótką próbę i próbę z pełnym progiem wykonajcie w oddzielnych przeładowaniach, z zapisaną zgodą przed przewijaniem. Jeżeli widoczność została osiągnięta bez zgody, tag pozostaje zablokowany i wcześniejszy wynik się nie odtwarza. [Reguła Element Visibility](https://support.google.com/tagmanager/answer/7679410)
 
-Pozostałe tagi GA4 mają typ **Google Analytics: GA4 Event**, ten sam identyfikator i nazwę zdarzenia równą nazwie po `GA4 |`. W **Event Parameters** wpiszcie tylko parametry z [tabeli zdarzeń](../dokumentacja/specyfikacja-zdarzen.md) i przypiszcie odpowiadające im DLV. Nie używajcie zmiennych typu Form Element, Click Text, User-Provided Data ani autozbierania z formularza. Tag dla `generate_lead` nie przejmuje parametrów poprzedniego zdarzenia z DLV. Meta i Clarity używają [tagów Custom HTML](kod-tagow.md) oraz opisanych w tabeli dodatkowych zgód. Ustawcie **Once per page** dla inicjalizacji Meta i Clarity, **Once per event** dla Meta Lead oraz tagów GA4 Event. Nie dołączajcie ich do All Pages, DOM Ready lub Window Loaded.
+## 3. GA4 i weryfikacja
 
-## 2. Google Analytics 4
+1. Utwórzcie usługę i strumień WWW z publicznym HTTPS. W tagu bazowym zostawcie domyślne automatyczne `page_view` (bez `send_page_view=false`). Dodajcie opisany [tag pomocniczy z ID](kod-tagow.md) w sekwencji przed Google tag do obsługi wycofania. W strumieniu wyłączcie **Form interactions** oraz **Page changes based on browser history events**. W konfiguracji GA4 wyłączcie zbieranie danych przekazywanych przez użytkownika. Nie podpinajcie dodatkowych miejsc docelowych ani ręcznego taga odsłony. Nie nadpisujcie `page_location` adresem obciętym z UTM. [Page views](https://developers.google.com/analytics/devguides/collection/ga4/views) · [Enhanced Measurement](https://support.google.com/analytics/answer/9216061)
+2. Dodajcie cztery tagi **Google Analytics: GA4 Event** według tabeli. W **Admin → Custom definitions** utwórzcie dokładnie trzy wymagane wymiary o zakresie **Event**: `cta_location`, `form_id`, `section_id`. Zróbcie to przed próbami. W **Admin → Events / Key events** oznaczcie `generate_lead` jako zdarzenie kluczowe, metoda **Once per event**. [Wymiary](https://support.google.com/analytics/answer/14239696) · [Zdarzenia kluczowe](https://support.google.com/analytics/answer/13366706)
+3. Zbierajcie osobno dowód sygnału w `dataLayer`, wykonania taga w **Preview/Tag Assistant** i odbioru w **DebugView**. W **Network** kontrolujcie żądania pomiarowe, np. `/g/collect`; ruch GTM i CMP jest osobną kategorią. Przejdźcie scenariusze [testów](../dokumentacja/plan-testow.md), w tym pusta próba bez `form_start`, inny błędny formularz z rzeczywistą edycją oraz jeden sukces. [DebugView](https://support.google.com/analytics/answer/7201382) · [Debugowanie zgód](https://developers.google.com/tag-platform/security/guides/consent-debugging)
+4. Przygotujcie eksploracje, wykonajcie po publikacji sześć prób poza Preview, sprawdźcie Realtime i uzupełnijcie wyniki po przetworzeniu ruchu. [Lejek, UTM i próby](../dokumentacja/analiza-danych.md)
 
-1. W **Admin** utwórzcie usługę projektu. Ustawcie strefę raportowania odpowiadającą Polsce. W **Data streams → Add stream → Web** podajcie rzeczywisty HTTPS i nazwę `EquiSoul LP`. Skopiujcie Measurement ID do `CONST | GA4 ID`.
-2. W strumieniu wyłączcie **Enhanced Measurement**. W konfiguracji wybiórczej wyłączcie **Form interactions** oraz **Page changes based on browser history events** w ustawieniach Page views. Automatyczny odsłonowy hit inicjalizacji kontroluje `send_page_view = false` w GTM. [Page views](https://developers.google.com/analytics/devguides/collection/ga4/views), [Enhanced Measurement](https://support.google.com/analytics/answer/9216061)
-3. W **Admin → Custom definitions → Create custom dimension** dodajcie wymiary o zakresie **Event**. Użyjcie kluczy `cta_id`, `cta_location`, `cta_text`, `section_id`, `form_id`. Wymiary Page location i Page title są wbudowane. [Definicje niestandardowe](https://support.google.com/analytics/answer/14239696)
-4. W **Admin → Events** oznaczcie odebrane `generate_lead` jako zdarzenie kluczowe lub dodajcie tę nazwę w **Key events** przed testami. Wybierzcie metodę liczenia raz na zdarzenie. Nie definiujcie kopii regułą Create event z tym samym wyzwalaczem.
-5. W **Preview** wprowadźcie publiczny URL. W zresetowanym profilu sprawdźcie najpierw Network bez decyzji i po odmowie, także bez Preview. W Preview przy zgodzie analitycznej sprawdźcie kolejność: Consent Initialization, aktualizacja zgód, gotowość, pojedyncze `page_view`. Porównajcie **Tags Fired**, **Variables**, **Consent** i **Data Layer** dla każdego zdarzenia. Przy obu dozwolonych kategoriach jeden `generate_lead` wyzwala oba tagi odbiorców. Przy zgodzie tylko marketingowej wyzwala wyłącznie Meta Lead. [Debugowanie zgody](https://developers.google.com/tag-platform/security/guides/consent-debugging)
-6. W **DebugView** wybierzcie przeglądarkę testową. Jeśli połączenie Preview nie daje sygnału debug, ustawcie `debug_mode=true` wyłącznie w wersji testowej tagu i usuńcie przed publikacją. Wykonajcie test CTA, widoczności programu, pustego formularza, błędnego e-maila i ukończenia. Sprawdźcie parametry i brak duplikatów, powtórzcie bez CTA. [DebugView](https://support.google.com/analytics/answer/7201382)
-7. Utwórzcie dwie **Funnel explorations**, dodatkowy lejek programu i tabelę kliknięć zgodnie z [analizą](../dokumentacja/analiza-danych.md). Zapiszcie reguły eksploracji nawet gdy po testach liczba zdarzeń jest niewystarczająca do wnioskowania.
+| Objaw | Kontrola |
+| --- | --- |
+| Sygnał istnieje, tag niewyzwolony | Reguła, ścieżka, stan dodatkowych zgód na zdarzeniu |
+| Tag wyzwolony, brak odbioru | ID, właściwy profil debug, Network, blokady przeglądarki |
+| Odsłona lub zdarzenie występuje podwójnie | Druga instalacja, pomiar historii, automatyczny pomiar form, dodatkowa reguła lub listener |
+| Parametr w DebugView, brak w eksploracji | Zakres Event, nazwa i czas przetwarzania |
+| Działa tylko w Preview | Wersja opublikowana GTM, właściwy hostname i aktualny deploy |
 
-## 3. Meta Pixel i odbiorcy
+## 4. Meta i Clarity
 
-1. W **Events Manager → Connect data → Web** utwórzcie źródło danych zespołu i wybierzcie konfigurację Pixela. Ustawcie uprawnienia obu członków zespołu. Skopiujcie ID do `CONST | Meta ID`.
-2. Użyjcie dwóch tagów GTM według [kodu](kod-tagow.md). Nie instalujcie drugi raz integracji partnerskiej ani skryptu w HTML. W ustawieniach źródła wyłączcie **Automatic Advanced Matching** i automatyczne wykrywanie zdarzeń. Nie używajcie Event Setup Tool do dodania leada po kliknięciu.
-3. W **Test Events** otwórzcie LP z Events Managera. Przy zgodzie tylko marketingowej sprawdźcie `PageView`. Pusty i błędny formularz powinny dać zero `Lead`. Poprawny, fikcyjny formularz powinien dać dokładnie jedno `Lead`. Przy samej analityce, odmowie i po wycofaniu sprawdźcie brak skryptu i hitów Meta. Zestawcie Events Manager z Network i, gdy dostępny, **Meta Pixel Helper**. Sprawdźcie **Diagnostics** źródła. [Meta Pixel](https://developers.facebook.com/docs/meta-pixel/), [zgody Pixela](https://developers.facebook.com/docs/meta-pixel/implementation/gdpr/)
-4. W **Audiences** dodajcie Website Custom Audience, według [reguł i kreacji](../dokumentacja/remarketing.md). Dołączcie zrzut konfiguracji uwzględnienia i wykluczenia, niezależnie od bieżącej liczebności grupy.
+**Meta.** W Events Manager wybierzcie rzeczywiste źródło Web i pobierzcie aktualny kod Pixela z jego ID. [Kod i ustawienia sekwencji](kod-tagow.md). Wyłączcie automatyczne dopasowanie zaawansowane, automatyczne wykrywanie zdarzeń i duplikujące reguły Event Setup Tool. W **Test Events** sprawdźcie pojedyncze PageView i Lead, brak Lead po błędzie oraz odmowę, częściowe zgody i wycofanie. Potwierdźcie Network (`facebook.com/tr`) i ewentualnie Pixel Helper. [Meta Pixel](https://developers.facebook.com/docs/meta-pixel/) · [Remarketing](../dokumentacja/remarketing.md)
 
-## 4. Microsoft Clarity
+**Clarity.** W projekcie dla publicznego URL odczytajcie Project ID. W GTM ręcznie wybierzcie z galerii **Microsoft Clarity – Official**, wpiszcie ID, użyjcie wyłącznie **CE – consent update** z filtrem LP, raz na stronę, z dodatkowym wymaganiem A. W ustawieniach projektu włączcie obsługę Consent Mode oraz maskowanie **Strict**. Strona ma dodatkowe `data-clarity-mask="True"` na formularzu. Zgody przekazuje Google Consent Mode z Cookiebot. Przy samej analityce spodziewajcie się `analytics_storage: GRANTED` i `ad_storage: DENIED`, przy obu odpowiednio obu `GRANTED`. W uruchomionej sesji wykonajcie kontrolę:
 
-1. Utwórzcie projekt z publicznym URL. W **Settings → Setup** odczytajcie identyfikator projektu. Skopiujcie go do `CONST | Clarity ID`. Dodajcie wyłącznie tag GTM z [kodu](kod-tagow.md).
-2. W **Settings → Masking** włączcie **Strict** i potwierdźcie, że obszary formularza i zgód mają `data-clarity-mask="True"`. Nie wywołujcie `identify`. Skrypt uruchamia się po zgodzie analitycznej i przekazuje `ad_Storage: denied` również przy zgodzie marketingowej, gdyż Clarity pełni wyłącznie funkcję analityczną. [ConsentV2](https://learn.microsoft.com/en-us/clarity/setup-and-installation/clarity-consent-api-v2), [maskowanie](https://learn.microsoft.com/en-us/clarity/setup-and-installation/clarity-masking)
-3. Przy odmowie i samej zgodzie marketingowej sprawdźcie brak żądań Clarity. Przy samej analityce sprawdźcie instalację na LP i nową sesję na liście **Recordings**, wpisując wyłącznie dane fikcyjne. Potwierdźcie zamaskowane wartości, w tym stan formularza po błędzie. Przy wycofaniu sprawdźcie kolejne żądania według procedury w planie testów. [Weryfikacja instalacji](https://learn.microsoft.com/en-us/clarity/setup-and-installation/clarity-setup)
-4. Przygotujcie mapę kliknięć i przewijania dla URL LP osobno dla mobile i desktopu. Oceńcie widoczność CTA i sekcji, martwe kliknięcia oraz problemy z nawigacją lub walidacją. Porównajcie z nagraniem i lejkiem, zapisując hipotezę oraz opis warunku jej weryfikacji. [Mapy interakcji](https://learn.microsoft.com/en-us/clarity/heatmaps-overview)
+```js
+clarity('metadata', (data, upgrade, consent) => console.log('consentStatus:', consent), false, true, true);
+```
 
-## 5. Opcja wdrożenia Cookiebot
+Sprawdźcie sygnały, nagranie po nowej próbie, maskowanie i mapy. Jeżeli `metadata` nie pokazuje oczekiwanego stanu, wstrzymajcie zbieranie do zweryfikowania wersji szablonu, integracji i sygnałów. Przy wycofaniu kontrolujcie także Network po przeładowaniu. [Szablon GTM](https://learn.microsoft.com/en-us/clarity/third-party-integrations/google-tag-manager) · [Zarządzanie zgodami](https://learn.microsoft.com/en-us/clarity/setup-and-installation/consent-management) · [Kontrola stanu](https://learn.microsoft.com/en-us/clarity/setup-and-installation/cookie-consent) · [Strict](https://learn.microsoft.com/en-us/clarity/setup-and-installation/clarity-masking)
 
-W paczce działa lokalny mechanizm **EquiSoul – ustawienia zgód**. Nie jest certyfikowanym CMP. Sprawdźcie możliwość dodania rzeczywistego hosta GitHub Pages do grupy domen oraz limit planu według skanu, także gdy inne podstrony korzystają z tego samego hosta. Jeżeli użyjecie Cookiebot, zamieńcie interfejs i źródło stanu w `consent.js`. Przycisk preferencji powinien wywołać `Cookiebot.renew()`. Odczyt `Cookiebot.consent.statistics` i `Cookiebot.consent.marketing` wykonajcie po `CookiebotOnConsentReady` oraz po `CookiebotOnAccept` i `CookiebotOnDecline`, z deduplikacją identycznego stanu. Zachowajcie kontrakt `get/subscribe`, rzeczywistą blokadę skryptów, zatrzymanie i przeładowanie przy odebraniu zgody. Publikujcie tylko jedno źródło stanu Google Consent Mode. Przy zachowaniu mostu GTM wyłączcie automatyczną wysyłkę sygnałów Google przez CMP zgodnie z jego dokumentacją. Wykonajcie ponownie całą macierz zgód. Ten wariant wymaga konta i weryfikacji hosta. [Plany Cookiebot](https://support.cookiebot.com/hc/en-us/articles/360003807613-How-can-I-get-a-Free-subscription), [API Cookiebot](https://www.cookiebot.com/en/developer/)
+## 5. Publikacja
 
-## 6. Publikacja kontenera i dowody
-
-Po przejściu testów wybierzcie **Submit → Publish and Create Version**. Nazwijcie wersję np. `EquiSoul | LP + Consent + GA4 + Meta + Clarity`. Z **Admin → Export Container** wyeksportujcie konkretną opublikowaną wersję do `gtm/container-published.json`. Powtórzcie pomiar pozytywny i test odmowy poza Preview. Dołączcie dowody opisane w [indeksie](../dowody/README.md). [Eksport kontenera](https://support.google.com/tagmanager/answer/6106997)
+Po sprawdzeniu tagów opublikujcie kontener z opisem zmian, odnotujcie numer w raporcie i powtórzcie [macierz zgód](../dokumentacja/plan-testow.md#macierz-zgód-na-opublikowanym-lp) poza Preview. Wyeksportujcie konkretną opublikowaną wersję do `gtm/container-published.json`. [Eksport GTM](https://support.google.com/tagmanager/answer/6106997)

@@ -7,6 +7,8 @@
   const email = document.getElementById('email');
   const experience = document.getElementById('experience');
   const fields = [name, email, experience];
+  const initialValues = new Map(fields.map(field => [field, field.value]));
+  const submit = form.querySelector('button[type=submit]');
 
   let started = false;
   let completed = false;
@@ -40,7 +42,7 @@
 
   function interact(event) {
     if (!event.isTrusted || !fields.includes(event.target)) return;
-    start();
+    if (event.target.value !== initialValues.get(event.target)) start();
     if (event.target.getAttribute('aria-invalid') === 'true') validate(event.target);
   }
 
@@ -49,7 +51,6 @@
   form.addEventListener('submit', event => {
     event.preventDefault();
     if (completed) return;
-    if (event.isTrusted) start();
     const invalid = fields.filter(field => !validate(field));
     if (invalid.length > 0) {
       invalid[0].focus();
@@ -58,6 +59,7 @@
 
     // Jedna konwersja na dokument. Najpierw pokazujemy sukces i czyścimy pola.
     completed = true;
+    submit.disabled = true;
     form.reset();
     form.hidden = true;
     success.hidden = false;

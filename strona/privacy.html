@@ -9,7 +9,8 @@
   <title>Prywatność | EquiSoul</title>
   <link rel="icon" href="assets/icons/favicon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="css/style.css">
-  <script defer src="js/config.js"></script>
+  <script src="js/config.js"></script>
+  <script src="js/consent-cookiebot.js"></script>
   <script defer src="js/consent.js"></script>
 </head>
 <body data-page="privacy">
@@ -19,14 +20,14 @@
     <h1>Informacje o prywatności</h1>
     <p>EquiSoul to fikcyjny projekt edukacyjny. Do demonstracji używaj fikcyjnych danych. Formularz waliduje je w przeglądarce i czyści po ukończeniu. Nie przekazuje ich do narzędzi pomiarowych, bazy ani poczty.</p>
     <h2>Wybór zgód</h2>
-    <p>Niezbędny zapis w pamięci przeglądarki pozwala zapamiętać ustawienia dotyczące analityki i marketingu. Obie kategorie opcjonalne są domyślnie wyłączone. Możesz zmienić ustawienia przyciskiem poniżej. Po wycofaniu aktywnej zgody landing page przeładowuje się według nowego wyboru.</p>
+    <p>Niezbędny zapis pozwala zapamiętać ustawienia dotyczące analityki i marketingu. W demonstracji wybór zapisuje lokalny panel, a w docelowym wdrożeniu zarządza nim Cookiebot. Obie kategorie opcjonalne są domyślnie wyłączone. Możesz zmienić ustawienia przyciskiem poniżej. Po wycofaniu aktywnej zgody strona przeładowuje się według nowego wyboru.</p>
     <p><button class="button button-solid" type="button" data-consent-open hidden>Ustawienia prywatności</button></p>
     <h2>Pomiar na stronie warsztatów</h2>
     <ul>
       <li><strong>Analityczne.</strong> GA4 mierzy wyświetlenie strony, kliknięcia głównych CTA, widoczność programu i etapy formularza. Microsoft Clarity wspiera ocenę użyteczności nagraniami i mapami interakcji. Obszar formularza ma jawne maskowanie.</li>
       <li><strong>Marketingowe.</strong> Meta Pixel mierzy wyświetlenie warsztatów i poprawne ukończenie demonstracji. Zdarzenia mogą służyć do zbudowania grupy remarketingowej.</li>
     </ul>
-    <p>Narzędzia uruchamiają się za pośrednictwem Google Tag Managera po skonfigurowaniu przez zespół i przy odpowiedniej zgodzie. Dostawcy mogą wówczas przetwarzać dane techniczne przeglądarki i używać identyfikatorów pomiarowych.</p>
+    <p>W docelowym wdrożeniu GTM ładuje Cookiebot, by umożliwić wybór zgód. Tagi pomiarowe uruchamiają się po odpowiedniej zgodzie. Lokalna demonstracja nie ładuje usług zewnętrznych. Dostawcy mogą wówczas przetwarzać dane techniczne przeglądarki i używać identyfikatorów pomiarowych.</p>
     <p>Informacje dostawców są dostępne w ich dokumentach. <a href="https://policies.google.com/privacy?hl=pl">Google</a>, <a href="https://privacy.microsoft.com/pl-pl/privacystatement">Microsoft</a>, <a href="https://www.facebook.com/privacy/policy/">Meta</a>.</p>
   </main>
   <footer class="site-footer"><div class="wrap footer-inner"><p>EquiSoul · Fikcyjny projekt edukacyjny</p><a href="./">Strona warsztatów</a></div></footer>

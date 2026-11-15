@@ -1,2 +1,3 @@
 # Meta
-Miejsce na potwierdzenie PageView i Lead oraz prób negatywnych z M01, a także konfigurację odbiorców i wykluczenia Lead z M02.
+
+Miejsce na PageView i Lead z Test Events, negatywną próbę bez Lead oraz konfigurację odbiorców z wykluczeniem. Scenariusze G04, M01 i M02. Status **NOT TESTED**.

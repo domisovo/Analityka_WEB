@@ -9,7 +9,8 @@
   <title>Pierwszy raz w siodle | EquiSoul</title>
   <link rel="icon" href="assets/icons/favicon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="css/style.css">
-  <script defer src="js/config.js"></script>
+  <script src="js/config.js"></script>
+  <script src="js/consent-cookiebot.js"></script>
   <script defer src="js/consent.js"></script>
   <script defer src="js/analytics.js"></script>
   <script defer src="js/main.js"></script>
@@ -69,7 +70,7 @@
 
     <section class="section program" id="workshop_program" aria-labelledby="program-title">
       <div class="wrap split">
-        <div>
+        <div id="workshop_program_summary">
           <p class="eyebrow on-dark"><span></span>Program warsztatów</p>
           <h2 id="program-title">Od pierwszego spotkania do pierwszej jazdy.</h2>
           <p>Przez cztery godziny poznasz kolejne etapy pracy z koniem. Na każdym możesz zadać pytanie lub poprosić o powtórzenie ćwiczenia.</p>
@@ -175,7 +176,7 @@
         </form>
         <div id="form-success" class="confirmation" tabindex="-1" hidden>
           <h3>Zgłoszenie demonstracyjne ukończone</h3>
-          <p>Dziękujemy za zainteresowanie warsztatami EquiSoul! Formularz demonstracyjny został poprawnie uzupełniony. Żadne dane osobowe nie zostały wysłane.</p>
+          <p>Demonstracja zakończona — dane nie zostały wysłane</p>
         </div>
       </div>
     </section>

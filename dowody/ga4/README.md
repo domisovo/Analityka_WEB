@@ -1,2 +1,3 @@
 # GA4
-Miejsce na DebugView z G02, widok zdarzenia kluczowego, dwie eksploracje lejka, widoczność programu i tabelę CTA z G03. Dla wykresów podajcie okres, warunki i mierzoną populację.
+
+Miejsce na G01–G06, próby U01–U06, eventy z DebugView i Realtime oraz definicje i wyniki eksploracji. Podajcie okres i populację. Status **NOT TESTED**.

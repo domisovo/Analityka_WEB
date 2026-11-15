@@ -10,7 +10,7 @@ Rozpakuj archiwum i w katalogu projektu uruchom:
 python3 -m http.server 8765 --bind 127.0.0.1 --directory strona
 ```
 
-Otwórz [localhost:8765](http://127.0.0.1:8765/). Używaj fikcyjnego imienia i adresu `test@example.com`. Przejście formularza działa od razu. Identyfikator GTM jest pusty, więc lokalne zdarzenia po zgodzie można sprawdzić przez `window.dataLayer` w konsoli, bez wysyłania do dostawców.
+Otwórz [localhost:8765](http://127.0.0.1:8765/). Używaj fikcyjnego imienia i adresu `test@example.com`. Przejście formularza działa od razu. Domyślny tryb `local` pozwala przećwiczyć interfejs zgód i sprawdzić `cta_click`, `form_start` oraz `lead_success` przez `window.dataLayer`. Kolejka jest lokalna nawet przy odmowie i tryb nigdy nie ładuje GTM. Docelowy tryb `cookiebot` jest rozłączny.
 
 ## Publikacja GitHub Pages
 
@@ -24,7 +24,7 @@ Otwórz [localhost:8765](http://127.0.0.1:8765/). Używaj fikcyjnego imienia i a
    ```
 2. Otwórz **Settings → Pages → Build and deployment → Source → GitHub Actions**. Uruchom workflow **Publikacja EquiSoul** przez **Actions → Run workflow** lub nowy push na `main`. Workflow wysyła wyłącznie `strona/` jako zawartość hostingu. Jeżeli repozytorium jest publiczne, jego źródła i dodane do niego dowody również będą publiczne, niezależnie od zakresu hostingu. Przed dodaniem dowodów usuń z nich dane kont.
 3. Otwórz URL wyświetlony po publikacji w **Settings → Pages** i wpisz go w raporcie. Przejdź po kotwicach i otwórz prywatność. Sprawdź zasoby na ścieżce repozytorium oraz HTTPS. [Instrukcja GitHub Pages](https://docs.github.com/en/pages/getting-started-with-github-pages/configuring-a-publishing-source-for-your-github-pages-site)
-4. Skonfiguruj usługi według [przewodnika](gtm/configuration-guide.md), uzupełnij prawdziwy identyfikator w `strona/js/config.js`, opublikuj zmianę i wykonaj testy z kontami. Eksport GTM z wersji opublikowanej należy do `gtm/`.
+4. Skonfiguruj usługi według [przewodnika](gtm/configuration-guide.md), ustaw tryb `cookiebot` i prawdziwy identyfikator GTM w `strona/js/config.js`, opublikuj zmianę i wykonaj testy z kontami. Eksport GTM z wersji opublikowanej należy do `gtm/`.
 
 ## Pliki projektu
 
@@ -32,11 +32,11 @@ Otwórz [localhost:8765](http://127.0.0.1:8765/). Używaj fikcyjnego imienia i a
 | --- | --- |
 | `raport.md` | Stan projektu i pola zespołu |
 | `strona/index.html`, `strona/privacy.html`, `strona/css/style.css` | Landing page, ustawienia prywatności i style |
-| `strona/js/main.js`, `form.js`, `analytics.js`, `consent.js`, `config.js` | Nawigacja, walidacja, zdarzenia, zgody i pole identyfikatora GTM |
+| `strona/js/main.js`, `form.js`, `analytics.js`, `consent.js`, `consent-cookiebot.js`, `config.js` | Nawigacja, walidacja, zdarzenia, zgody i pole identyfikatora GTM |
 | `strona/assets/images/`, `strona/assets/icons/` | Pięć plików WebP i favicon |
-| `gtm/README.md`, `configuration-guide.md`, `kod-tagow.md` | Instrukcje konfiguracji, kod tagów i miejsce na prawdziwy eksport |
-| `dokumentacja/` | Brief, makieta, plan pomiarowy, specyfikacja zdarzeń, decyzje AI, plan testów, analiza, remarketing, źródła i macierz zgodności |
-| `dowody/` | Indeks dowodów, wynik JSON i zrzuty lokalne oraz katalogi platformowe |
+| `gtm/README.md`, `configuration-guide.md`, `kod-tagow.md` | Cookiebot Consent Mode v2, tagi GA4 i Meta, szablon Clarity i miejsce na finalny eksport |
+| `dokumentacja/` | Audyt sześciu instrukcji, brief, warianty i makiety, szablon konkurencji i testów z parą, plan pomiaru, zdarzenia, analiza, remarketing i macierz zgodności |
+| `dowody/` | Indeks i braki, bieżący wynik i zrzuty, historia v1 oraz katalogi platformowe |
 | `tests/browser.cjs` | Automatyczne testy w Chromium |
 | `.github/workflows/pages.yml` | Workflow publikacji statycznej |
 

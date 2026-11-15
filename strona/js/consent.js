@@ -1,6 +1,8 @@
 (() => {
   'use strict';
 
+  if (window.EquiSoulConfig.consentMode !== 'local') return;
+
   const key = 'equisoul.consent.v1';
   const lp = document.body.dataset.page === 'workshop';
   const denied = Object.freeze({ analytics: false, marketing: false });
@@ -28,39 +30,6 @@
   let saved = reset ? denied : load();
   let current = saved ?? denied;
   let reloading = false;
-  const listeners = new Set();
-
-  function expireCookies(pattern) {
-    const names = document.cookie.split(';').map(pair => pair.trim().split('=')[0]);
-    const host = location.hostname;
-    const domains = ['', ...host.split('.').map((_, index, parts) => parts.slice(index).join('.'))];
-    const directories = location.pathname.split('/').slice(0, -1);
-    const paths = new Set(['/', ...directories.map((_, index) => directories.slice(0, index + 1).join('/') || '/')]);
-    for (const name of names.filter(name => pattern.test(name))) {
-      for (const domain of domains) {
-        for (const path of paths) {
-          document.cookie = `${name}=; Max-Age=0; path=${path}${domain ? '; domain=' + domain : ''}`;
-        }
-      }
-    }
-  }
-
-  function stopAnalytics() {
-    const measurementId = window.EquiSoulGa4MeasurementId;
-    if (typeof measurementId === 'string' && /^G-[A-Z0-9]+$/.test(measurementId)) {
-      window['ga-disable-' + measurementId] = true;
-    }
-    if (typeof window.clarity === 'function') {
-      window.clarity('consentv2', { ad_Storage: 'denied', analytics_Storage: 'denied' });
-      window.clarity('stop');
-    }
-    expireCookies(/^(?:_ga(?:_|$)|_clck$|_clsk$)/);
-  }
-
-  function stopMarketing() {
-    if (typeof window.fbq === 'function') window.fbq('consent', 'revoke');
-    expireCookies(/^_fb[pc]$/);
-  }
 
   function apply(next, persisted = true) {
     if (reloading) return;
@@ -69,8 +38,6 @@
     saved = next;
     const lostAnalytics = previous.analytics && !current.analytics;
     const lostMarketing = previous.marketing && !current.marketing;
-    if (lostAnalytics) stopAnalytics();
-    if (lostMarketing) stopMarketing();
     if (lp && (lostAnalytics || lostMarketing)) {
       reloading = true;
       if (persisted) {
@@ -82,7 +49,6 @@
       }
       return;
     }
-    for (const listener of listeners) listener(current);
     render();
   }
 
@@ -109,7 +75,7 @@
     <aside class="consent-banner" aria-labelledby="consent-title" data-clarity-mask="True" hidden>
       <div>
         <strong id="consent-title">Twoje ustawienia prywatności</strong>
-        <p>Zdecyduj, czy zezwalasz na analitykę i marketing. <a href="privacy.html">Informacje o prywatności</a></p>
+        <p>Lokalna demonstracja wyboru analityki i marketingu. <a href="privacy.html">Informacje o prywatności</a></p>
       </div>
       <div class="consent-actions">
         <button class="button button-outline" type="button" data-choice="reject">Odrzuć opcjonalne</button>
@@ -121,8 +87,8 @@
       <h2 id="consent-settings-title">Ustawienia prywatności</h2>
       <p>Niezbędny zapis pozwala zapamiętać wybór w tej przeglądarce.</p>
       <label class="consent-option"><input type="checkbox" checked disabled> Niezbędne</label>
-      <label class="consent-option"><input id="allow-analytics" type="checkbox"> Analityczne <small>Pomiar wizyt i użyteczności przez GA4 i Microsoft Clarity.</small></label>
-      <label class="consent-option"><input id="allow-marketing" type="checkbox"> Marketingowe <small>Pomiar i remarketing w Meta Pixel.</small></label>
+      <label class="consent-option"><input id="allow-analytics" type="checkbox"> Analityczne <small>Docelowo pomiar wizyt i użyteczności przez GA4 i Microsoft Clarity.</small></label>
+      <label class="consent-option"><input id="allow-marketing" type="checkbox"> Marketingowe <small>Docelowo pomiar i remarketing w Meta Pixel.</small></label>
       <div class="consent-actions">
         <button class="button button-solid" type="button" data-choice="save">Zapisz wybór</button>
         <button class="button button-outline" type="button" data-choice="reject">Odrzuć opcjonalne</button>
@@ -169,9 +135,5 @@
     if (event.persisted) apply(load());
   });
 
-  window.EquiSoulConsent = Object.freeze({
-    get: () => current,
-    subscribe: listener => listeners.add(listener)
-  });
   render();
 })();

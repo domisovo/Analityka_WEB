@@ -1,2 +1,3 @@
 # GTM
-Miejsce na zrzuty Tag Assistant z G01 i E01–E05 oraz potwierdzenie numeru wersji w G06. Plik eksportu zapiszcie w `gtm/` w katalogu głównym projektu. Do każdego zrzutu dodajcie opis obserwacji i zakresu, który potwierdza.
+
+Miejsce na podpisane zrzuty G01–G05 i E01–E08. W eksporcie wybierzcie opublikowaną wersję i zapiszcie JSON w katalogu projektu `gtm/`. Status prób i eksportu **NOT TESTED**.

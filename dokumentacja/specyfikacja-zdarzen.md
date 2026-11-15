@@ -1,20 +1,15 @@
-# Specyfikacja zdarzeń
+# Słownik zdarzeń
 
-Źródłem zdarzeń jest `strona/js/analytics.js`. GTM odbiera jedną kolejkę `window.dataLayer` na LP. Strona prywatności ma ustawienia zgód i nie inicjuje kontenera. Poniższa tabela wymienia wyłącznie parametry aplikacji. Biblioteki dostawców mogą dodać własne dane techniczne.
+| Zachowanie | Sygnał źródłowy lub reguła | GA4 | Meta | Parametry i częstotliwość |
+| --- | --- | --- | --- | --- |
+| Wyświetlenie LP | `cookie_consent_update` z Cookiebot i tag bazowy właściwego dostawcy | `page_view` automatycznie z Google tag | `PageView` z base | Adres LP, w GA4 także wejściowe UTM. Raz na dokument na dostawcę i tylko przy jego zgodzie. |
+| Kliknięcie CTA | `cta_click` | `cta_click` | — | `cta_location` = navigation, hero lub bottom. Każde rzeczywiste kliknięcie. |
+| Widoczność oferty | GTM Element Visibility na ID `workshop_program_summary` | `section_view` | — | `section_id=workshop_program_summary`, co najmniej 50% i 2000 ms czasu kwalifikowanego, raz na stronę. |
+| Rozpoczęcie formularza | `form_start` | `form_start` | — | `form_id=workshop_interest_form`, raz na dokument po pierwszej rzeczywistej zmianie pola. Sam fokus i pusta próba nie są zmianą. |
+| Poprawny sukces | `lead_success` | `generate_lead` | `Lead` | `form_id=workshop_interest_form` w kolejce i GA4. Meta bez wartości pól i bez dodatkowych parametrów aplikacji. Maksymalnie raz na dokument. |
 
-| Zdarzenie | Warunek i krotność | Parametry | Odbiorca |
-| --- | --- | --- | --- |
-| `page_view` | Pierwsze aktywowanie analityki dla aktualnego dokumentu, również przy wczytaniu zapamiętanej zgody. Raz na dokument. | `page_location` (origin + pathname), `page_title` | GA4 |
-| `cta_click` | Każda aktywacja linku głównego CTA przy aktywnej analityce. | `cta_id` = navigation_cta / hero_cta / bottom_cta, `cta_location` = navigation / hero / bottom, `cta_text` = Zgłoś zainteresowanie | GA4 |
-| `section_view` | Pierwszy pomiar spełnionej widoczności programu i aktywnej analityki, według reguły poniżej. | `section_id` = workshop_program | GA4 |
-| `form_start` | Pierwsza rzeczywista edycja, zmiana wyboru lub próba zatwierdzenia, także z błędem. Wymaga aktywnej analityki w tym momencie. Raz na próbę w dokumencie. | `form_id` = workshop_interest_form | GA4 |
-| `generate_lead` | Walidacja wszystkich pól, wyczyszczenie formularza, wyświetlenie sukcesu. Raz na dokument, przy przynajmniej jednej zgodzie. Każdy tag sprawdza własną kategorię. | `form_id` = workshop_interest_form | GA4 pod tą samą nazwą, Meta jako Lead |
-| `equisoul_analytics_ready` | Pierwsza aktywna zgoda analityczna w dokumencie. | `page_location`, `page_title` | GTM → konfiguracja Google tag i Clarity |
-| `equisoul_marketing_ready` | Pierwsza aktywna zgoda marketingowa w dokumencie. | `page_location`, `page_title` | GTM → inicjalizacja Meta + PageView |
-| `equisoul_consent_update` | Stan początkowy, następnie faktyczna zmiana zgody bez przeładowania. Po wycofaniu nowy dokument emituje aktualny stan. | `consent_analytics`, `consent_marketing` (Boolean) | Tylko GTM |
+Główne CTA zachowują istniejące ID. Tylko `cta_location` jest mierzonym parametrem CTA. Trzy wymiary Event to `cta_location`, `form_id`, `section_id`. Zdarzenie kluczowe `generate_lead` ma metodę raz na zdarzenie. `cookie_consent_update` to sygnał CMP dla GTM.
 
-Wysokość widocznej części sekcji musi przez co najmniej 1000 ms wynosić co najmniej `0,5 × min(wysokość sekcji, wysokość ekranu)`. Skrócenie ekspozycji lub ukrycie karty resetuje czas. Ustawienia prywatności otwarte w dialogu również wstrzymują pomiar. Obserwatory widoczności i rozmiaru, przewijanie oraz zmiany rozmiaru uruchamiają ponowną ocenę. Po spełnieniu warunku obserwacja kończy się na czas tego dokumentu. Na telefonie miara opisuje widok fragmentu programu, bez gwarancji przeczytania czterech etapów.
+W trybie lokalnym niezależnie od wyboru UI można sprawdzić trzy sygnały aplikacji w kolejce. W trybie Cookiebot CTA i start wymagają aktualnej zgody analitycznej, a sukces jest sygnałem dla co najmniej jednej aktywnej kategorii. Każdy tag ponownie weryfikuje własne wymagania Consent Mode. Zmiana zgody nie emituje historycznych zdarzeń. Rozpoczęcie przed zgodą i ukończenie po niej może dać obserwowany sukces bez startu. Użycie opcji prywatności nie tworzy zdarzeń formularza.
 
-Przy zgodzie w trakcie wizyty odsłona dotyczy bieżącego widoku od momentu zgody. Wcześniejsze CTA, start i sukces się nie odtwarzają. Jeśli ktoś zaczął formularz przed zgodą, może mieć po zgodzie sam `generate_lead`. Zapamiętana zgoda działa od rozpoczęcia kolejnego dokumentu. Pełne przeładowanie, w tym po wycofaniu zgody, rozpoczyna nową próbę strony. W obrębie tej samej próby nie są używane trwałe identyfikatory formularza.
-
-Wartości pól formularza są poza schematem danych. Źródło strony nie wysyła formularza. CSP blokuje natywne wysłanie, a pola nie mają atrybutu `name`. W GTM wymagana jest konfiguracja prywatności dostawców opisana w [przewodniku](../gtm/configuration-guide.md).
+W kodzie LP `form.js` waliduje i kolejno blokuje przycisk, czyści pola, pokazuje potwierdzenie oraz emituje sygnał DOM. `analytics.js` przekształca sygnał na `lead_success`. Wartości pól pozostają w kontrolkach, których nie serializujemy. `page_view` i `section_view` powstają w GTM/Google tag. Były kiedyś w lokalnej kolejce i po rewizji zostały usunięte z JS. [Konfiguracja](../gtm/configuration-guide.md)
